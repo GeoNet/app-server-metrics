@@ -1,0 +1,17 @@
+.ant-targets-build.xml
+nbactions.xml
+nb-configuration.xml
+build-base.xml
+build/
+dist/
+lib-ivy/
+nbproject/private/
+.externalToolBuilders
+.settings
+.classpath
+.project
+target/
+profiles.xml
+*~
+.idea/
+*.iml
