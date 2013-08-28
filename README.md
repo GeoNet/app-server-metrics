@@ -8,9 +8,7 @@ App Server Metrics can currently be sent to Librato Metrics.
 
 ### Librato Metrics
 
-https://metrics.librato.com/
-
-Send metrics to Librato Metrics every sixty seconds.
+Send metrics to Librato Metrics (https://metrics.librato.com/) every sixty seconds.  See the dashboard images under `screen-shots`.
 
 1. Create a Librato Metrics account https://metrics.librato.com/
 2. Create a key with Record Access for the Librato Metrics account.
