@@ -4,7 +4,7 @@
     <groupId>nz.org.geonet</groupId>
     <artifactId>app-server-metrics</artifactId>
     <packaging>war</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>app-server-metrics</name>
 
     <properties>
