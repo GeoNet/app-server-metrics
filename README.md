@@ -49,7 +49,7 @@ collection.interval=60000
 ## Security
 
 Jolokia is used for the HTTP-JMX bridge.  Access to the embedded Jolokia servlet is restricted to 127.0.0.1 only by the
-file `src/main/resources/jolokia-access.xml
+file `src/main/resources/jolokia-access.xml`
 
 See also http://www.jolokia.org/reference/html/security.html
 
