@@ -4,9 +4,13 @@ Collect JVM and other metrics about your Java web application server with a simp
 
 ## Quick Start
 
+App Server Metrics can currently be sent to Librato Metrics.
+
 ### Librato Metrics
 
-Send metrics to Librato Metrics for visualisation.
+https://metrics.librato.com/
+
+Send metrics to Librato Metrics every sixty seconds.
 
 1. Create a Librato Metrics account https://metrics.librato.com/
 2. Create a key with Record Access for the Librato Metrics account.
@@ -17,10 +21,17 @@ librato.user=some.user@mail.com
 librato.api.key=XXX
 ```
 
-4. Deploy the app-server-metrics war to you app server at `/app-server-metrics`
-5. Log into Librato Metrics and create dashboards etc.
+4. Download a release war from http://geonet.artifactoryonline.com/geonet/public-releases/nz/org/geonet/app-server-metrics/
+5. Deploy the app-server-metrics war to you app server at `/app-server-metrics`.
+6. Log into Librato Metrics and create dashboards.  The metrics are sent with the host short name as the source and the app
+server name added to the metric name.  This makes them very suitable for using with dynamic instruments and dashboards.
 
-## Other Options
+### Other Metrics Targets
+
+There is Sender to output to stderr which is most useful for development.  If you want other targets see Adding Other Senders below.
+ You only need to implement one method and add to the SenderFactory.
+
+## General Options
 
 ### Properties file
 
@@ -63,6 +74,11 @@ If the server is not Jetty or Tomcat then the name 'UnknownJVM' is used for iden
 
 The app server that the application is deployed into must have an http listener on 8080 that accepts connections from localhost
 and the application must be deployed at the context /app-server-metrics
+
+### Jetty Specifics
+
+* Jetty needs to have JMX enabled.
+* If the Jetty statistics handler is enabled then more metrics such as requests per second and response codes are collected.
 
 ## Database Connection Pools
 
