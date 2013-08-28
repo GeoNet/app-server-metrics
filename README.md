@@ -1,27 +1,25 @@
 # App Server Metrics
 
-Collect JVM and other metrics about your Java web application server with a simple war install.
+Collect JVM and other metrics for your Java web application server (e.g., Jetty, Tomcat) with a simple war install.
 
 ## Quick Start
-
-App Server Metrics can currently be sent to Librato Metrics.
 
 ### Librato Metrics
 
 Send metrics to Librato Metrics (https://metrics.librato.com/) every sixty seconds.  See the dashboard images under `screen-shots`.
 
-1. Create a Librato Metrics account https://metrics.librato.com/
-2. Create a key with Record Access for the Librato Metrics account.
-3. Put the Librato user name and token in a file `/etc/sysconfig/webapp.app-server-metrics.properties`:
+* Create a Librato Metrics account https://metrics.librato.com/
+* Create a key with Record Access for the Librato Metrics account.
+* Put the Librato user name and token in a file `/etc/sysconfig/webapp.app-server-metrics.properties`:
 
 ```
-librato.user=some.user@mail.com
-librato.api.key=XXX
+  librato.user=some.user@mail.com
+  librato.api.key=XXX
 ```
 
-4. Download a release war from http://geonet.artifactoryonline.com/geonet/public-releases/nz/org/geonet/app-server-metrics/
-5. Deploy the app-server-metrics war to you app server at `/app-server-metrics`.
-6. Log into Librato Metrics and create dashboards.  The metrics are sent with the host short name as the source and the app
+* Download a war from http://geonet.artifactoryonline.com/geonet/public-releases/nz/org/geonet/app-server-metrics/
+* Deploy the app-server-metrics war to you app server at `/app-server-metrics`.
+* Log into Librato Metrics and create dashboards.  The metrics are sent with the host short name as the source and the app
 server name added to the metric name.  This makes them very suitable for using with dynamic instruments and dashboards.
 
 ### Other Metrics Targets
@@ -82,7 +80,7 @@ and the application must be deployed at the context /app-server-metrics
 
 ### Tomcat JNDI
 
-If there is are database connection pool(s) specified in Tomcat then metrics for these will be gathered.
+If there is are database connection pool(s) specified in Tomcat via JNDI then metrics for these will be gathered.
 
 ## Under the Covers.
 
@@ -92,19 +90,19 @@ Jolokia (http://www.jolokia.org/) is used for the HTTP-JMX bridge and client.  J
 
 A Sender is used to get the metrics to the visualisation end point.  Additional Senders can be added by;
 
-1. implementing `nz.org.geonet.metrics.sender.Sender`
-2. and creating that Sender from `nz.org.geonet.metrics.sender.SenderFactory` when appropriate configuration is available.
+* implementing `nz.org.geonet.metrics.sender.Sender`
+* and creating that Sender from `nz.org.geonet.metrics.sender.SenderFactory` when appropriate configuration is available.
 
 ## Adding Collectors for other Application Servers
 
 Collectors collect JVM and other app server metrics.  Additional Collectors can be added by;
 
-1. Add the application server type to `nz.org.geonet.metrics.collector.ServerType`
-2. Implementing `nz.org.geonet.metrics.collector.Collector`
-3. Adding config to ``nz.org.geonet.metrics.collector.CollectorFactory` to create the Collector based on the result of
+* Add the application server type to `nz.org.geonet.metrics.collector.ServerType`
+* Implementing `nz.org.geonet.metrics.collector.Collector`
+* Adding config to `nz.org.geonet.metrics.collector.CollectorFactory` to create the Collector based on the result of
 calling `nz.org.geonet.metrics.collector.MetricsClient.serverType()`
 
-Note - the application does not currently consider application server version and is only unique across application server name.
+***Note:*** the application does not currently consider application server version and is only unique across application server name.
 If you run multiple versions of the same application server on the same host then you will need to do more work.
 
 ## Development
@@ -112,7 +110,9 @@ If you run multiple versions of the same application server on the same host the
 Run the war using the embedded Jetty class with a Sender that outputs to std err every 2000 millis with:
 
 ```
- mvn test-compile exec:java -Dwebapp.app-server-metrics.sender.stderr=true -Dwebapp.app-server-metrics.collection.interval=2000
+ mvn test-compile exec:java \
+   -Dwebapp.app-server-metrics.sender.stderr=true \
+   -Dwebapp.app-server-metrics.collection.interval=2000
 ```
 
 The same properties can be set for developing with an external Tomcat install.
