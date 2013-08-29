@@ -82,6 +82,62 @@ and the application must be deployed at the context /app-server-metrics
 
 If there is are database connection pool(s) specified in Tomcat via JNDI then metrics for these will be gathered.
 
+### Spring Managed Database Connection Pool
+
+These instructions are for DBCP.  This needs testing for other pools e.g., jdbc-pool.
+
+Expose the pool as an mbean named `jdbcDataSource:name=YourName` where `YourName` is the name you would like to
+appear in the metrics.  If your app uses multiple data sources then use this to keep the names unique across the sources.
+
+Below is an example Spring configuration for connecting to a postgres database called `bob` using DBCP for the pool.
+The connection pool metrics are exposed as an mbean named `jdbcDataSource:name=BobDataSource`.
+
+The following metrics will then be gathered:
+
+* BobDataSource.numActive
+* BobDataSource.numIdle
+* BobDataSource.maxActive
+
+```
+      <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+          <property name="url" value="jdbc:postgresql://${server}:5432/bob" />
+          <property name="driverClassName" value="org.postgresql.Driver" />
+          <property name="username" value="${user}" />
+          <property name="password" value="${password}" />
+          <property name="initialSize" value="10" />
+          <property name="maxActive" value="20" />
+          <property name="maxWait" value="-1" />
+          <property name="validationQuery" value="SELECT 1" />
+      </bean>
+
+      <!--Expose the DBCP pool via JMX -->
+      <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+          <property name="locateExistingServerIfPossible" value="true" />
+      </bean>
+      <bean id="mbeanExporter" class="org.springframework.jmx.export.MBeanExporter">
+          <property name="assembler">
+              <bean class="org.springframework.jmx.export.assembler.MethodNameBasedMBeanInfoAssembler">
+                  <property name="managedMethods">
+                      <list>
+                          <value>getNumActive</value>
+                          <value>getMaxActive</value>
+                          <value>getNumIdle</value>
+                          <value>getMaxIdle</value>
+                          <value>getMaxWait</value>
+                          <value>getInitialSize</value>
+                      </list>
+                  </property>
+              </bean>
+          </property>
+          <property name="beans">
+              <map>
+                  <entry key="jdbcDataSource:name=BobDataSource" value-ref="dataSource"/>
+              </map>
+          </property>
+          <property name="server" ref="mbeanServer" />
+      </bean>
+```
+
 ## Under the Covers.
 
 Jolokia (http://www.jolokia.org/) is used for the HTTP-JMX bridge and client.  Jolokia is awesome!

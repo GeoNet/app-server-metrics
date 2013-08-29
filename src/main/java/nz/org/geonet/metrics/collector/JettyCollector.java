@@ -1,6 +1,8 @@
 package nz.org.geonet.metrics.collector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Collects metrics for the Jetty web server.
@@ -13,8 +15,9 @@ public class JettyCollector implements Collector {
 
     private boolean jettyJMX = false;
     private boolean jettyStatistics = false;
-    private final Collector jvmCollector;
     private final long collectionInterval;
+
+    private List<Collector> collectors;
 
     private final MetricsClient metricsClient;
 
@@ -22,7 +25,11 @@ public class JettyCollector implements Collector {
         this.metricsClient = metricsClient;
         this.collectionInterval = collectionInterval;
 
-        jvmCollector = new JVMCollector(metricsClient, collectionInterval);
+        collectors = new ArrayList<Collector>();
+        collectors.add(new JVMCollector(metricsClient, collectionInterval));
+
+        JdbcDataSourceCollector dataSourceCollector = new JdbcDataSourceCollector(metricsClient, serverType(), collectionInterval);
+        if (dataSourceCollector.hasDataSources()) collectors.add(dataSourceCollector);
 
         jettyJMX = metricsClient.enabled("org.eclipse.jetty.util.thread:type=queuedthreadpool,id=0");
         if (jettyJMX) {
@@ -35,7 +42,11 @@ public class JettyCollector implements Collector {
     }
 
     public HashMap<String, Number> gather() {
-        HashMap<String, Number> metrics = jvmCollector.gather();
+        HashMap<String, Number> metrics = new HashMap<String, Number>();
+
+        for (Collector collector : collectors) {
+            metrics.putAll(collector.gather());
+        }
 
         if (jettyJMX) {
             metrics.putAll(jettyQueuedThreadPool());

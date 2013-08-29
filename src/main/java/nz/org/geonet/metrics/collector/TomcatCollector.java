@@ -1,6 +1,8 @@
 package nz.org.geonet.metrics.collector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,7 +17,7 @@ public class TomcatCollector implements Collector {
     private boolean httpConnector = false;
     private boolean ajpConnector = false;
     private boolean javaxSql = false;
-    private final Collector jvmCollector;
+    private List<Collector> collectors;
     private final long collectionInterval;
     private final Map<String, String> javaxDataSource;
 
@@ -25,7 +27,11 @@ public class TomcatCollector implements Collector {
         this.metricsClient = metricsClient;
         this.collectionInterval = collectionInterval;
 
-        jvmCollector = new JVMCollector(metricsClient, collectionInterval);
+        collectors = new ArrayList<Collector>();
+        collectors.add(new JVMCollector(metricsClient, collectionInterval));
+
+        JdbcDataSourceCollector dataSourceCollector = new JdbcDataSourceCollector(metricsClient, serverType(), collectionInterval);
+        if (dataSourceCollector.hasDataSources()) collectors.add(dataSourceCollector);
 
         httpConnector = metricsClient.enabled("Catalina:type=ThreadPool,name=http-8080");
         ajpConnector = metricsClient.enabled("Catalina:type=ThreadPool,name=jk-8009");
@@ -54,7 +60,11 @@ public class TomcatCollector implements Collector {
     }
 
     public HashMap<String, Number> gather() {
-        HashMap<String, Number> metrics = jvmCollector.gather();
+        HashMap<String, Number> metrics = new HashMap<String, Number>();
+
+        for (Collector collector : collectors) {
+            metrics.putAll(collector.gather());
+        }
 
         if (httpConnector) {
             metrics.putAll(httpConnector());
