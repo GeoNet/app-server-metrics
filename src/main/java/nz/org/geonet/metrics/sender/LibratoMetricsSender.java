@@ -39,6 +39,9 @@ public class LibratoMetricsSender implements Sender {
 
         httpPost.setHeader("Content-Type", "application/json");
 
+        httpPost.setHeader("User-Agent", "app-server-metrics/" +
+                (getClass().getPackage().getImplementationVersion() != null ? getClass().getPackage().getImplementationVersion() : "development"));
+
         try {
             source = InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {

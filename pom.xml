@@ -95,6 +95,22 @@
                 </configuration>
             </plugin>
 
+            <!--Make sure the version information goes into the manifest so that we can-->
+            <!--use it in the LibratoMetricsSender.-->
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                    <archiveClasses>true</archiveClasses>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
