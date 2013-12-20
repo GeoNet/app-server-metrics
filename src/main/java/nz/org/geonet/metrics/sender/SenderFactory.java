@@ -29,6 +29,7 @@ public class SenderFactory {
 
         String libratoUser = null;
         String libratoApiKey = null;
+        String hostedGraphiteApiKey = null;
 
         String propertiesFile = "/etc/sysconfig/webapp.app-server-metrics.properties";
 
@@ -41,14 +42,20 @@ public class SenderFactory {
             properties.load(new FileInputStream((propertiesFile)));
             libratoUser = properties.getProperty("librato.user");
             libratoApiKey = properties.getProperty("librato.api.key");
+            hostedGraphiteApiKey = properties.getProperty("hostedgraphite.api.key");
         } catch (Exception ex) {
             log.warn("Problem reading properties file");
         }
 
         if (System.getProperty("webapp.app-server-metrics.sender.stderr") != null && "true".equals(System.getProperty("webapp.app-server-metrics.sender.stderr"))) {
             sender = new StdErrSender();
+            log.info("creating a StdErr sender");
         } else if (libratoUser != null && libratoApiKey != null) {
             sender = new LibratoMetricsSender(libratoUser, libratoApiKey);
+            log.info("creating a Librato sender");
+        } else if (hostedGraphiteApiKey != null) {
+            sender = new HostedGraphiteSender(hostedGraphiteApiKey);
+            log.info("creating a Hosted Graphite Sender");
         } else {
             throw new SenderException("Cannot find enough properties to configure a sender.");
         }

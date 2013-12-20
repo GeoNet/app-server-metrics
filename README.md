@@ -2,7 +2,26 @@
 
 Collect JVM and other metrics for your Java web application server (e.g., Jetty, Tomcat) with a simple war install.
 
+Uses the Jetty http client and requires Java 7+.
+
 ## Quick Start
+
+### Hosted Graphite
+
+Send metrics to Hosted Graphite (https://www.hostedgraphite.com) every sixty seconds.
+
+* Create a Hosted Graphite account https://www.hostedgraphite.com
+* Create an api access key for the account.
+* Put the api access key in a file `/etc/sysconfig/webapp.app-server-metrics.properties`:
+
+```
+  hostedgraphite.api.key=XXX
+
+```
+
+* Download a war from http://geonet.artifactoryonline.com/geonet/public-releases/nz/org/geonet/app-server-metrics/
+* Deploy the app-server-metrics war to you app server at `/app-server-metrics`.
+* Log into Hosted Graphite and create dashboards.
 
 ### Librato Metrics
 
@@ -166,7 +185,7 @@ If you run multiple versions of the same application server on the same host the
 Run the war using the embedded Jetty class with a Sender that outputs to std err every 2000 millis with:
 
 ```
- mvn test-compile exec:java \
+ mvn test compile exec:java \
    -Dwebapp.app-server-metrics.sender.stderr=true \
    -Dwebapp.app-server-metrics.collection.interval=2000
 ```
