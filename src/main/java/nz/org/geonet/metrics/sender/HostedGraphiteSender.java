@@ -10,9 +10,7 @@ import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.net.InetAddress;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,17 +30,7 @@ public class HostedGraphiteSender implements Sender {
 
     public HostedGraphiteSender(String apiKey) {
 
-        // Figure out a suitable host name to use as the metric source.
-        try {
-            source = InetAddress.getLocalHost().getHostName();
-        } catch (Exception e) {
-            log.debug(e);
-        }
-
-        if (source == null || "localhost".equals(source.toLowerCase()) || "127.0.0.1".equals(source)) {
-            source = UUID.randomUUID().toString();
-            log.warn("Can't find a meaningful hostname - using " + source);
-        }
+        source = Util.source();
 
         //  Create an https capable http client.
         SslContextFactory sslContextFactory = new SslContextFactory();

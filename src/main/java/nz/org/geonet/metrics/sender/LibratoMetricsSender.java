@@ -11,18 +11,16 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Sends metrics to Librato Metrics https://metrics.librato.com/
  *
  * @author Geoff Clitheroe
- * Date: 8/12/13
- * Time: 11:28 AM
+ *         Date: 8/12/13
+ *         Time: 11:28 AM
  */
 public class LibratoMetricsSender implements Sender {
 
@@ -42,16 +40,7 @@ public class LibratoMetricsSender implements Sender {
         httpPost.setHeader("User-Agent", "app-server-metrics/" +
                 (getClass().getPackage().getImplementationVersion() != null ? getClass().getPackage().getImplementationVersion() : "development"));
 
-        try {
-            source = InetAddress.getLocalHost().getHostName();
-        } catch (Exception e) {
-            log.debug(e);
-        }
-
-        if (source == null || "localhost".equals(source.toLowerCase()) || "127.0.0.1".equals(source)) {
-            source = UUID.randomUUID().toString();
-            log.warn("Can't find a meaningful hostname - using " + source);
-        }
+        source = Util.source();
     }
 
     public void send(String serverType, Map<String, Number> metrics) {
@@ -92,9 +81,9 @@ public class LibratoMetricsSender implements Sender {
      * Converts the Map to a suitable string for sending to the Librato Metrics api.
      * See http://dev.librato.com/v1/post/metrics
      *
-     * @param source the source name e.g., the server running the JVM.
+     * @param source     the source name e.g., the server running the JVM.
      * @param serverType the application server name, should be unique across a source.
-     * @param metrics map of metrics.
+     * @param metrics    map of metrics.
      * @return a JSON string suitable for sending to the Librato Metrics api.
      */
     String jsonString(String source, String serverType, Map<String, Number> metrics) {

@@ -11,11 +11,15 @@ import java.util.Map;
  */
 public class StdErrSender implements Sender {
 
-    public void send(String serverType, Map<String, Number> metrics) {
-        System.err.println(serverType);
+    String source;
 
+    StdErrSender() {
+        source = Util.source();
+    }
+
+    public void send(String serverType, Map<String, Number> metrics) {
         for (String key : metrics.keySet()) {
-            System.err.println(key + " " + metrics.get(key));
+            System.err.println(source + "." + serverType + "." + key + " " + metrics.get(key));
         }
     }
 }
