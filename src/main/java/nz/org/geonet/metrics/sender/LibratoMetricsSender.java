@@ -1,19 +1,19 @@
 package nz.org.geonet.metrics.sender;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.util.BasicAuthentication;
+import org.eclipse.jetty.client.util.StringContentProvider;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Sends metrics to Librato Metrics https://metrics.librato.com/
@@ -24,21 +24,36 @@ import java.util.Map;
  */
 public class LibratoMetricsSender implements Sender {
 
-    private final DefaultHttpClient httpClient = new DefaultHttpClient();
-    private final HttpPost httpPost = new HttpPost("https://metrics-api.librato.com/v1/metrics");
     private String source;
+    HttpClient httpClient;
+    URI uri;
 
     private final static Logger log = Logger.getLogger(LibratoMetricsSender.class.getSimpleName());
 
     public LibratoMetricsSender(String userName, String apiKey) {
 
-        httpClient.getCredentialsProvider().setCredentials(new AuthScope("metrics-api.librato.com", 443),
-                new UsernamePasswordCredentials(userName, apiKey));
+        try {
+            uri = new URI("https://metrics-api.librato.com/v1/metrics");
+        } catch (Exception e) {
+            log.error(e);
+        }
 
-        httpPost.setHeader("Content-Type", "application/json");
+        //  Create an https capable http client with basic auth.
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        httpClient = new HttpClient(sslContextFactory);
 
-        httpPost.setHeader("User-Agent", "app-server-metrics/" +
+        HttpField agent = new HttpField("User-Agent", "app-server-metrics/" +
                 (getClass().getPackage().getImplementationVersion() != null ? getClass().getPackage().getImplementationVersion() : "development"));
+
+        httpClient.setUserAgentField(agent);
+
+        httpClient.getAuthenticationStore().addAuthentication(new BasicAuthentication(uri, "Librato API", userName, apiKey));
+
+        try {
+            httpClient.start();
+        } catch (Exception e) {
+            log.error(e);
+        }
 
         source = Util.source();
     }
@@ -49,32 +64,18 @@ public class LibratoMetricsSender implements Sender {
         // metrics are received.
 
         try {
-            httpPost.setEntity(new ByteArrayEntity(jsonString(source, serverType, metrics).getBytes("UTF8")));
+            ContentResponse response = httpClient.POST(uri).
+                    content(new StringContentProvider(jsonString(source, serverType, metrics)), "application/json").timeout(10, TimeUnit.SECONDS).send();
 
-            HttpResponse response = httpClient.execute(httpPost);
-
-            // Log the response
-            BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            String output = "";
-            String buffer;
-
-            while ((buffer = in.readLine()) != null) {
-                output += buffer + "\n";
-            }
-
-            in.close();
-
-            if (response.toString().toUpperCase().matches(".*200 OK.*")) {
+            if (response.getStatus() == 200) {
                 log.info("Librato Metrics Sender OK");
             } else {
-                log.error("Librato Metrics: " + response.toString());
-                log.error("OUTPUT: " + output);
+                log.error("Librato Metrics Sender code: " + response.getStatus());
+                log.error("Response content: " + response.getContentAsString());
             }
-
         } catch (Exception e) {
-            log.debug(e);
+            log.error(e);
         }
-
     }
 
     /**
