@@ -24,6 +24,7 @@ public class JVMCollector implements Collector {
         metrics.putAll(jvmPermGen());
         metrics.putAll(jvmThreads());
         metrics.putAll(classLoading());
+        metrics.putAll(cpuLoad());
 
         return metrics;
     }
@@ -34,6 +35,22 @@ public class JVMCollector implements Collector {
 
     public String serverType() {
         return ServerType.UnknownJVM.name();
+    }
+
+    HashMap<String, Number> cpuLoad() {
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=OperatingSystem", "ProcessCpuLoad,SystemCpuLoad");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("ProcessCpuLoad")) {
+            result.put("ProcessCpuLoad", responseMap.get("ProcessCpuLoad"));
+        }
+
+        if (responseMap.containsKey("SystemCpuLoad")) {
+            result.put("SystemCpuLoad", responseMap.get("SystemCpuLoad"));
+        }
+
+        return result;
     }
 
     HashMap<String, Number> jvmHeapMemoryUsage() {
