@@ -1,0 +1,39 @@
+apply plugin: 'war'
+apply plugin: 'maven'
+apply plugin: 'jetty'
+
+group = 'nz.org.geonet'
+version = '2.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.jolokia', name: 'jolokia-core', version: '1.0.5'
+    compile group: 'org.jolokia', name: 'jolokia-client-java', version: '1.1.3'
+    compile group: 'log4j', name: 'log4j', version: '1.2.16'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlets', version: '9.0.3.v20130506'
+    compile group: 'org.eclipse.jetty', name: 'jetty-client', version: '9.0.3.v20130506'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.0.3.v20130506'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.0.3.v20130506'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.0.3.v20130506'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-jmx', version: '9.0.3.v20130506'
+    providedCompile group: 'org.eclipse.jetty.orbit', name: 'javax.servlet', version: '3.0.0.v201112011016'
+}
+
+war {
+    manifest {
+        attributes(
+                "Specification-Title": project.name,
+                "Specification-Version": version,
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Implementation-Vendor-Id": project.group
+        )
+    }
+}

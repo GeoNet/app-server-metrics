@@ -185,7 +185,7 @@ If you run multiple versions of the same application server on the same host the
 Run the war using the embedded Jetty class with a Sender that outputs to std err every 2000 millis with:
 
 ```
- mvn test compile exec:java \
+ ./gradlew jettyRun \
    -Dwebapp.app-server-metrics.sender.stderr=true \
    -Dwebapp.app-server-metrics.collection.interval=2000
 ```

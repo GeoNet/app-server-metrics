@@ -1,3 +1,4 @@
+.gradle
 .ant-targets-build.xml
 nbactions.xml
 nb-configuration.xml
