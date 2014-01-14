@@ -16,3 +16,4 @@ profiles.xml
 *~
 .idea/
 *.iml
+/.nb-gradle/profiles/private/

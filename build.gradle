@@ -1,15 +1,30 @@
 apply plugin: 'war'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'jetty'
+apply plugin: 'build-version'
 
 group = 'nz.org.geonet'
-version = '2.0.0-SNAPSHOT'
+version = buildVersion.version
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
+}
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://geonet.artifactoryonline.com/geonet/public-releases'
+        }
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath group: 'nz.org.geonet', name: 'gradle-build-version-plugin', version: '1.0.1-SNAPSHOT'
+
+    }
 }
 
 dependencies {
@@ -35,5 +50,22 @@ war {
                 "Implementation-Version": version,
                 "Implementation-Vendor-Id": project.group
         )
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.web
+        }
+    }
+    repositories {
+        maven {
+            url geonetPublicReleases
+            credentials {
+                username geonetUser
+                password geonetPassword
+            }
+        }
     }
 }
