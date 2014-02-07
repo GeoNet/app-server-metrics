@@ -19,10 +19,9 @@ buildscript {
             url 'https://geonet.artifactoryonline.com/geonet/public-releases'
         }
         mavenCentral()
-        mavenLocal()
     }
     dependencies {
-        classpath group: 'nz.org.geonet', name: 'gradle-build-version-plugin', version: '1.0.1'
+        classpath group: 'nz.org.geonet', name: 'gradle-build-version-plugin', version: '1.0.2'
 
     }
 }
@@ -53,18 +52,24 @@ war {
     }
 }
 
+// Set some optional release properties vi gradle.properties or the command line.
+// This allows the build to run with an unconfigured publishing closure if you don't
+// know the publishing properties.
+def releaseUser = hasProperty('geonetUser') ? geonetUser : ""
+def releasePassword = hasProperty('geonetPassword') ? geonetPassword : ""
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.web
+            from components.java
         }
     }
     repositories {
         maven {
-            url geonetPublicReleases
+            url 'https://geonet.artifactoryonline.com/geonet/public-releases'
             credentials {
-                username geonetUser
-                password geonetPassword
+                username releaseUser
+                password releasePassword
             }
         }
     }
