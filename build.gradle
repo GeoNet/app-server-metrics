@@ -52,11 +52,11 @@ war {
     }
 }
 
-// Set some optional release properties vi gradle.properties or the command line.
-// This allows the build to run with an unconfigured publishing closure if you don't
-// know the publishing properties.
-def releaseUser = hasProperty('geonetUser') ? geonetUser : ""
-def releasePassword = hasProperty('geonetPassword') ? geonetPassword : ""
+def publishUrl = 'https://geonet.artifactoryonline.com/geonet/public-snapshots'
+
+if (System.getProperty("isRelease") && "true".equals(System.getProperty("isRelease"))) {
+    publishUrl = 'https://geonet.artifactoryonline.com/geonet/public-releases'
+}
 
 publishing {
     publications {
@@ -68,8 +68,8 @@ publishing {
         maven {
             url 'https://geonet.artifactoryonline.com/geonet/public-releases'
             credentials {
-                username releaseUser
-                password releasePassword
+                username geonetUser
+                password geonetPassword
             }
         }
     }
