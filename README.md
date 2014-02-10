@@ -4,7 +4,7 @@ Collect JVM and other metrics for your Java web application server (e.g., Jetty,
 
 Uses the Jetty http client and requires Java 7+.
 
-[![Build Status](https://snap-ci.com/WuXU59h2KZjjuPb9xz2rwiqsrqmx-umwvjKcucCKcz0/build_image)](https://snap-ci.com/projects/GeoNet/app-server-metrics/build_history)
+[![Build Status](https://snap-ci.com/p_XO7xdmZA54IwVQrKbjnV0L2L8RlHSO1M24oE32s6M/build_image)](https://snap-ci.com/projects/GeoNet/app-server-metrics/build_history)
 
 ## Quick Start
 
