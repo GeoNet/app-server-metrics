@@ -61,7 +61,7 @@ if (System.getProperty("isRelease") && "true".equals(System.getProperty("isRelea
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            from components.web
         }
     }
     repositories {
