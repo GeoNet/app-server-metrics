@@ -22,6 +22,11 @@ public class JVMCollector implements Collector {
     public HashMap<String, Number> gather() {
         HashMap<String, Number> metrics = jvmHeapMemoryUsage();
         metrics.putAll(jvmPermGen());
+        metrics.putAll(jvmNonHeapMemoryUsage());
+        metrics.putAll(jvmCodeCache());
+        metrics.putAll(jvmEdenSpace());
+        metrics.putAll(jvmSurvivorSpace());
+        metrics.putAll(jvmOldGen());
         metrics.putAll(jvmThreads());
         metrics.putAll(classLoading());
         metrics.putAll(cpuLoad());
@@ -70,6 +75,23 @@ public class JVMCollector implements Collector {
         return result;
     }
 
+    HashMap<String, Number> jvmNonHeapMemoryUsage() {
+
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=Memory", "NonHeapMemoryUsage");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("used")) {
+            result.put("NonHeapMemoryUsage.used", responseMap.get("used"));
+        }
+
+        if (responseMap.containsKey("max")) {
+            result.put("NonHeapMemoryUsage.max", responseMap.get("max"));
+        }
+
+        return result;
+    }
+
     HashMap<String, Number> jvmPermGen() {
 
         HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=MemoryPool,name=PS Perm Gen", "Usage");
@@ -83,6 +105,74 @@ public class JVMCollector implements Collector {
             if (responseMap.containsKey("max")) {
                 result.put("PermGen.max", responseMap.get("max"));
             }
+
+        return result;
+    }
+
+    HashMap<String, Number> jvmEdenSpace() {
+
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=MemoryPool,name=PS Eden Space", "Usage");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("used")) {
+            result.put("EdenSpace.used", responseMap.get("used"));
+        }
+
+        if (responseMap.containsKey("max")) {
+            result.put("EdenSpace.max", responseMap.get("max"));
+        }
+
+        return result;
+    }
+
+    HashMap<String, Number> jvmSurvivorSpace() {
+
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=MemoryPool,name=PS Survivor Space", "Usage");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("used")) {
+            result.put("SurvivorSpace.used", responseMap.get("used"));
+        }
+
+        if (responseMap.containsKey("max")) {
+            result.put("SurvivorSpace.max", responseMap.get("max"));
+        }
+
+        return result;
+    }
+
+    HashMap<String, Number> jvmOldGen() {
+
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=MemoryPool,name=PS Old Gen", "Usage");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("used")) {
+            result.put("OldGen.used", responseMap.get("used"));
+        }
+
+        if (responseMap.containsKey("max")) {
+            result.put("OldGen.max", responseMap.get("max"));
+        }
+
+        return result;
+    }
+
+    HashMap<String, Number> jvmCodeCache() {
+
+        HashMap<String, Number> responseMap = metricsClient.read("java.lang:type=MemoryPool,name=Code Cache", "Usage");
+
+        HashMap<String, Number> result = new HashMap<String, Number>();
+
+        if (responseMap.containsKey("used")) {
+            result.put("CodeCache.used", responseMap.get("used"));
+        }
+
+        if (responseMap.containsKey("max")) {
+            result.put("CodeCache.max", responseMap.get("max"));
+        }
 
         return result;
     }
