@@ -25,6 +25,11 @@ public class Util {
     public static String source() {
         String source = null;
 
+        final String property = System.getProperty("webapp.app-server-metrics.source");
+        if(property != null && property.length() > 0) {
+            return property;
+        }
+
         try {
             source = InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {
